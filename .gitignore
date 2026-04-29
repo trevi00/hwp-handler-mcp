@@ -1,0 +1,29 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.uv/
+uv.lock.tmp
+dist/
+build/
+*.egg-info/
+
+# 분석용 외부 레포 (commit 안 함)
+_external/
+
+# IDE
+.vscode/
+.idea/
+
+# 테스트 산출물
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 환경
+.env
+.env.local

@@ -1,0 +1,98 @@
+[project]
+name = "hwp-mcp"
+version = "0.1.0"
+description = "MCP server for reading Korean HWP/HWPX documents (HWP 5.x, HWPX, HWP 3.x best-effort)"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "rudtn", email = "rudtnrla20000@gmail.com" }]
+requires-python = ">=3.11,<3.13"
+keywords = ["mcp", "hwp", "hwpx", "korean", "hancom"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Text Processing",
+]
+dependencies = [
+    "mcp[cli]>=1.27.0,<2.0.0",
+    "python-hwpx>=2.9,<3.0",
+    "hwp-extract>=0.1,<0.2",
+    "olefile>=0.47",
+    "lxml>=4.9",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+hwp3 = ["hwplib-py>=1.0"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+hwp-mcp = "hwp_mcp.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/trevi00/hwp-mcp"
+Repository = "https://github.com/trevi00/hwp-mcp"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hwp_mcp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "B", "UP", "S", "RET", "SIM", "PT"]
+ignore = ["S101"]   # pytest의 assert 허용
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]   # 테스트 비번 허용
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["olefile.*", "lxml.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+asyncio_mode = "auto"
+markers = [
+    "integration: real library calls (hwp-extract, python-hwpx)",
+    "e2e: MCP stdio simulation",
+]
+
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.20.2",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.12",
+]
