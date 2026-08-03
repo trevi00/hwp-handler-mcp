@@ -1,7 +1,7 @@
-# hwp-mcp 코드 컨벤션
+# hwp-handler-mcp 코드 컨벤션
 
 작성일: 2026-04-29
-적용 범위: `src/hwp_mcp/`, `tests/`
+적용 범위: `src/hwp_handler_mcp/`, `tests/`
 
 ---
 
@@ -54,7 +54,7 @@ def extract_text(path, password=None):
 ## 2. 프로젝트 구조
 
 ```
-hwp-mcp/
+hwp-handler-mcp/
 ├── pyproject.toml
 ├── uv.lock                 # 커밋
 ├── README.md
@@ -62,9 +62,9 @@ hwp-mcp/
 ├── .gitignore
 ├── .python-version         # 3.11
 ├── src/
-│   └── hwp_mcp/
+│   └── hwp_handler_mcp/
 │       ├── __init__.py     # 빈 파일 또는 __version__ 만
-│       ├── __main__.py     # `python -m hwp_mcp`
+│       ├── __main__.py     # `python -m hwp_handler_mcp`
 │       ├── server.py       # FastMCP 인스턴스 + 도구 등록
 │       ├── ir/             # 내부 표현
 │       │   ├── __init__.py
@@ -128,7 +128,7 @@ server.py
 
 ### 3.3 에러 응답
 ```python
-from hwp_mcp.errors import McpHwpError, ErrorCode
+from hwp_handler_mcp.errors import McpHwpError, ErrorCode
 
 raise McpHwpError(
     code=ErrorCode.DRM_PROTECTED,
@@ -175,7 +175,7 @@ def setup_logging() -> None:
 ```
 
 ### 4.3 로거 이름
-- 모듈별: `logging.getLogger(__name__)` (예: `hwp_mcp.parsers.hwp5`)
+- 모듈별: `logging.getLogger(__name__)` (예: `hwp_handler_mcp.parsers.hwp5`)
 - 절대 root logger에 직접 message X
 
 ### 4.4 비밀번호 누출 금지
@@ -224,7 +224,7 @@ def setup_logging() -> None:
 ### 6.4 stdout 청결성
 ```python
 def test_no_stdout_pollution(capfd):
-    from hwp_mcp.server import mcp
+    from hwp_handler_mcp.server import mcp
     out, _ = capfd.readouterr()
     assert out == "", f"stdout polluted: {out!r}"
 ```

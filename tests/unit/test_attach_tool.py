@@ -5,9 +5,9 @@ import zipfile
 from pathlib import Path
 
 import pytest
-from mcp.shared.exceptions import McpError
 
-from hwp_mcp.tools.attach import (
+from hwp_handler_mcp._compat import McpError
+from hwp_handler_mcp.tools.attach import (
     _guess_media_type,
     list_attachments_impl,
     read_attachment_impl,
@@ -88,7 +88,5 @@ def test_read_attachment_too_large(tmp_path: Path) -> None:
         z.writestr("Contents/content.hpf", "<package/>")
         z.writestr("BinData/big.bin", payload)
     with pytest.raises(McpError) as exc_info:
-        read_attachment_impl(
-            str(target), storage_id="BinData/big.bin", max_size_bytes=512
-        )
+        read_attachment_impl(str(target), storage_id="BinData/big.bin", max_size_bytes=512)
     assert exc_info.value.error.data["code"] == "ATTACHMENT_TOO_LARGE"

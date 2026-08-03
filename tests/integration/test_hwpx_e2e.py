@@ -1,15 +1,16 @@
 """HWPX end-to-end 통합 테스트 (synthetic fixture 사용)."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from hwp_mcp.tools.attach import list_attachments_impl, read_attachment_impl
-from hwp_mcp.tools.inspect import detect_format_impl, inspect_structure_impl
-from hwp_mcp.tools.metadata import extract_metadata_impl
-from hwp_mcp.tools.tables import extract_tables_impl
-from hwp_mcp.tools.text import extract_text_impl
+from hwp_handler_mcp.tools.attach import list_attachments_impl, read_attachment_impl
+from hwp_handler_mcp.tools.inspect import detect_format_impl, inspect_structure_impl
+from hwp_handler_mcp.tools.metadata import extract_metadata_impl
+from hwp_handler_mcp.tools.tables import extract_tables_impl
+from hwp_handler_mcp.tools.text import extract_text_impl
 
 pytestmark = pytest.mark.integration
 
@@ -69,9 +70,7 @@ def test_list_attachments_hwpx(synthetic_hwpx: Path) -> None:
 def test_read_attachment_hwpx_roundtrip(synthetic_hwpx: Path, png_payload: bytes) -> None:
     import base64
 
-    result = read_attachment_impl(
-        str(synthetic_hwpx), storage_id="BinData/image1.png"
-    )
+    result = read_attachment_impl(str(synthetic_hwpx), storage_id="BinData/image1.png")
     assert base64.b64decode(result.content_base64) == png_payload
 
 

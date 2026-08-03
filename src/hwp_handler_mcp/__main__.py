@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hwp_mcp.server import mcp
+from hwp_handler_mcp.server import mcp
 
 
 def main() -> None:

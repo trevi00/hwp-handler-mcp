@@ -1,4 +1,5 @@
 """list_attachments + read_attachment MCP 도구."""
+
 from __future__ import annotations
 
 import base64
@@ -10,9 +11,9 @@ from pathlib import Path
 import olefile
 from pydantic import BaseModel, Field
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import Format
-from hwp_mcp.parsers.detect import detect_magic
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import Format
+from hwp_handler_mcp.parsers.detect import detect_magic
 
 
 class AttachmentInfo(BaseModel):
@@ -55,7 +56,7 @@ def list_attachments_impl(path: str, password: str | None = None) -> ListAttachm
     if password is not None:
         raise_hwp_error(
             ErrorCode.PASSWORD_REQUIRED,
-            detail="비밀번호 복호화는 Phase B에서 지원 예정",
+            detail="암호화된 문서는 지원하지 않습니다",
         )
 
     if fmt == Format.HWP5:
@@ -89,7 +90,7 @@ def read_attachment_impl(
     if password is not None:
         raise_hwp_error(
             ErrorCode.PASSWORD_REQUIRED,
-            detail="비밀번호 복호화는 Phase B에서 지원 예정",
+            detail="암호화된 문서는 지원하지 않습니다",
         )
 
     if fmt == Format.HWP5:

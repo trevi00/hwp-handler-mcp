@@ -1,4 +1,5 @@
 """MCP 서버 도구 등록 검증 + stdout 청결성."""
+
 from __future__ import annotations
 
 import asyncio
@@ -8,34 +9,43 @@ import pytest
 pytestmark = pytest.mark.integration
 
 
-def test_all_seven_tools_registered() -> None:
-    from hwp_mcp.server import mcp
+READ_TOOLS = {
+    "detect_format",
+    "extract_text",
+    "extract_metadata",
+    "inspect_structure",
+    "extract_tables",
+    "list_attachments",
+    "read_attachment",
+    "convert_to_markdown",
+}
 
-    async def _list():
-        return await mcp.list_tools()
+WRITE_TOOLS = {
+    "create_document",
+    "replace_text",
+    "fill_form",
+    "set_header_footer",
+}
 
-    tools = asyncio.run(_list())
-    names = {t.name for t in tools}
-    expected = {
-        "detect_format",
-        "extract_text",
-        "extract_metadata",
-        "inspect_structure",
-        "extract_tables",
-        "list_attachments",
-        "read_attachment",
-    }
+
+def _tools():
+    """MCP SDK 1.x는 list_tools()가 코루틴, 2.x는 동기 — 둘 다 받는다."""
+    from hwp_handler_mcp.server import mcp
+
+    result = mcp.list_tools()
+    if hasattr(result, "__await__"):
+        return asyncio.run(result)  # type: ignore[arg-type]
+    return result
+
+
+def test_all_tools_registered() -> None:
+    names = {t.name for t in _tools()}
+    expected = READ_TOOLS | WRITE_TOOLS
     assert names == expected, f"missing: {expected - names}, extra: {names - expected}"
 
 
 def test_tool_descriptions_are_korean() -> None:
-    from hwp_mcp.server import mcp
-
-    async def _list():
-        return await mcp.list_tools()
-
-    tools = asyncio.run(_list())
-    for tool in tools:
+    for tool in _tools():
         assert tool.description is not None
         # 한국어 문자(가나다 영역)가 description에 들어 있어야 함
         assert any("가" <= c <= "힣" for c in tool.description), (
@@ -50,9 +60,9 @@ def test_no_stdout_pollution_on_import(capfd: pytest.CaptureFixture[str]) -> Non
     # 모듈을 새로 import
     import importlib
 
-    import hwp_mcp.server
+    import hwp_handler_mcp.server
 
-    importlib.reload(hwp_mcp.server)
+    importlib.reload(hwp_handler_mcp.server)
     out_after, err_after = capfd.readouterr()
     assert out_after == "", f"stdout polluted on import: {out_after!r}"
 
@@ -61,10 +71,10 @@ def test_logger_writes_to_stderr_not_stdout(capfd: pytest.CaptureFixture[str]) -
     """로깅이 stderr로만 가는지 확인 (MCP stdio 통신 안전성)."""
     import logging
 
-    from hwp_mcp.logging_setup import setup_logging
+    from hwp_handler_mcp.logging_setup import setup_logging
 
     setup_logging()
-    log = logging.getLogger("hwp_mcp.test_check")
+    log = logging.getLogger("hwp_handler_mcp.test_check")
     log.warning("테스트 로그 한글")
     out, err = capfd.readouterr()
     assert out == "", f"stdout에 로그 누출: {out!r}"

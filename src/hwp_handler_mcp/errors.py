@@ -3,8 +3,9 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any, NoReturn
 
-from mcp.shared.exceptions import McpError
 from mcp.types import INTERNAL_ERROR, INVALID_PARAMS, ErrorData
+
+from hwp_handler_mcp._compat import build_mcp_error
 
 
 class ErrorCode(StrEnum):
@@ -74,4 +75,4 @@ def raise_hwp_error(
             if key.lower() in ("password", "passwd", "pw"):
                 continue
             data[key] = value
-    raise McpError(ErrorData(code=rpc_code, message=message, data=data))
+    raise build_mcp_error(ErrorData(code=rpc_code, message=message, data=data))

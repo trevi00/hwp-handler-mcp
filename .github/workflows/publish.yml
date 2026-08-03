@@ -1,0 +1,81 @@
+name: Publish to PyPI
+
+# GitHub Release 를 만들면 발행한다. 태그만으로 발행하지 않는 이유는,
+# 릴리스 노트를 쓰는 행위가 사람의 명시적 승인 지점이 되기 때문이다.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      # 발행 직전에 다시 돌린다. CI 통과 이후 태그가 다른 커밋을 가리킬 수 있다.
+      - name: Test
+        env:
+          PYTHONIOENCODING: utf-8
+        run: uv run pytest -q
+
+      - name: Build
+        run: uv build
+
+      - name: Check metadata
+        run: uvx twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/hwp-handler-mcp
+    permissions:
+      # Trusted Publishing (OIDC). API 토큰을 저장하지 않는다 —
+      # 유출될 장기 크리덴셜 자체가 없다.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  registry:
+    name: publish to MCP Registry
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      # 레지스트리는 GitHub OIDC 로 io.github.trevi00/* 네임스페이스 소유를 확인한다.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate
+        run: ./mcp-publisher login github-oidc
+
+      # PyPI 소유권은 배포된 패키지 설명(README)의 `mcp-name:` 토큰으로 확인된다.
+      # 그래서 PyPI 발행(publish job) 이후에 실행해야 한다.
+      - name: Publish server
+        run: ./mcp-publisher publish

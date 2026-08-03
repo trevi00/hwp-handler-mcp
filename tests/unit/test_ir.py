@@ -4,7 +4,7 @@ import dataclasses
 
 import pytest
 
-from hwp_mcp.ir import (
+from hwp_handler_mcp.ir import (
     BreakKind,
     Document,
     Format,

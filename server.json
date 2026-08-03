@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.trevi00/hwp-handler-mcp",
+  "title": "HWP Handler",
+  "description": "Read Korean HWP/HWPX documents; edit and generate HWPX, including label-based form filling.",
+  "version": "0.2.0",
+  "repository": {
+    "url": "https://github.com/trevi00/hwp-handler-mcp",
+    "source": "github",
+    "id": "1224199635"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "hwp-handler-mcp",
+      "version": "0.2.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "PYTHONIOENCODING",
+          "description": "Set to utf-8 on Windows so Korean text in log output does not fail on cp949 consoles.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "HWP_MCP_LOG_LEVEL",
+          "description": "Logging level (DEBUG/INFO/WARNING/ERROR). Defaults to WARNING. Logs go to stderr only.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

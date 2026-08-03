@@ -1,4 +1,5 @@
 """extract_text MCP 도구."""
+
 from __future__ import annotations
 
 import time
@@ -6,11 +7,11 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import BreakKind, Document, Format, InlineKind, TablePayload
-from hwp_mcp.parsers.detect import detect_magic
-from hwp_mcp.parsers.hwp5 import parse_hwp5
-from hwp_mcp.parsers.hwpx import parse_hwpx
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import BreakKind, Document, Format, InlineKind, TablePayload
+from hwp_handler_mcp.parsers.detect import detect_magic
+from hwp_handler_mcp.parsers.hwp5 import parse_hwp5
+from hwp_handler_mcp.parsers.hwpx import parse_hwpx
 
 
 class ExtractText(BaseModel):
@@ -39,7 +40,7 @@ def extract_text_impl(
 
     Args:
         path: HWP/HWPX 파일 절대경로.
-        password: 비밀번호 보호 문서의 비밀번호 (Phase B에서 활성).
+        password: 내부 가드용. 암호화 문서는 지원하지 않으며 값을 주면 거부한다.
         max_chars: 결과 텍스트 최대 문자 수.
         offset: 페이징 오프셋.
         include_tables: True면 표를 Markdown으로 인라인. False면 [표 N] placeholder.
@@ -49,20 +50,14 @@ def extract_text_impl(
     p = Path(path)
 
     if max_chars < 1:
-        raise_hwp_error(
-            ErrorCode.OFFSET_OUT_OF_RANGE, detail="max_chars must be >= 1"
-        )
+        raise_hwp_error(ErrorCode.OFFSET_OUT_OF_RANGE, detail="max_chars must be >= 1")
     if offset < 0:
-        raise_hwp_error(
-            ErrorCode.OFFSET_OUT_OF_RANGE, detail="offset must be >= 0"
-        )
+        raise_hwp_error(ErrorCode.OFFSET_OUT_OF_RANGE, detail="offset must be >= 0")
 
     fmt = detect_magic(p)
     doc = _dispatch_parse(fmt, str(p), password)
 
-    full_text = document_to_text(
-        doc, include_tables=include_tables, include_images=include_images
-    )
+    full_text = document_to_text(doc, include_tables=include_tables, include_images=include_images)
     total = len(full_text)
 
     if offset > total:
@@ -100,10 +95,9 @@ def _dispatch_parse(fmt: Format, path: str, password: str | None) -> Document:
     """포맷별 파서 디스패치."""
     if fmt == Format.HWP5:
         if password is not None:
-            # Phase A: 비번 미지원 명시
             raise_hwp_error(
                 ErrorCode.PASSWORD_REQUIRED,
-                detail="비밀번호 복호화는 Phase B에서 지원 예정",
+                detail="암호화된 문서는 지원하지 않습니다",
             )
         return parse_hwp5(path)
     if fmt == Format.HWPX:
@@ -111,7 +105,7 @@ def _dispatch_parse(fmt: Format, path: str, password: str | None) -> Document:
     if fmt == Format.HWP3:
         raise_hwp_error(
             ErrorCode.UNSUPPORTED_VERSION,
-            detail="HWP 3.x는 best-effort 모드로 Phase B에서 지원 예정",
+            detail="HWP 3.x(한글 97/98)는 지원하지 않습니다",
         )
     raise_hwp_error(ErrorCode.INVALID_FORMAT, detail=f"포맷 인식 실패: {fmt}")
     raise AssertionError("unreachable")  # ruff RET503
@@ -132,9 +126,7 @@ def document_to_text(
             line: list[str] = []
             for run in para.runs:
                 line.append(run.text)
-                if run.inline_marker is not None and run.inline_marker < len(
-                    para.inline_objects
-                ):
+                if run.inline_marker is not None and run.inline_marker < len(para.inline_objects):
                     obj = para.inline_objects[run.inline_marker]
                     if obj.kind == InlineKind.TABLE:
                         if include_tables and isinstance(obj.payload, TablePayload):
@@ -165,6 +157,4 @@ def _table_to_markdown(table: TablePayload) -> str:
 
 def _cell_to_text(cell) -> str:  # type: ignore[no-untyped-def]
     """Cell IR → 단일 라인 텍스트 (셀 안 단락은 공백으로 join)."""
-    return " ".join(
-        "".join(run.text for run in para.runs) for para in cell.paragraphs
-    )
+    return " ".join("".join(run.text for run in para.runs) for para in cell.paragraphs)

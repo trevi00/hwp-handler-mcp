@@ -1,4 +1,4 @@
-# hwp-mcp 요구사항
+# hwp-handler-mcp 요구사항
 
 > **목표**: Claude Code/Desktop 등 MCP 클라이언트에서 한글(.hwp/.hwpx) 문서를 안전하고 정확하게 읽을 수 있는 자체 MCP 서버.
 
@@ -11,7 +11,7 @@
 
 이미 존재하는 `hwpx-mcp-server` (airmang, HWPX-only)와 비교한 차별점:
 
-| 영역 | hwpx-mcp-server | **hwp-mcp (우리)** |
+| 영역 | hwpx-mcp-server | **hwp-handler-mcp (우리)** |
 |---|---|---|
 | HWPX | ✅ 완전 | ✅ python-hwpx 위임 |
 | HWP5 (.hwp 바이너리) | ❌ | ✅ **핵심** (hwp-extract + hwplib-py) |

@@ -1,55 +1,57 @@
 [project]
-name = "hwp-mcp"
-version = "0.1.0"
-description = "MCP server for reading Korean HWP/HWPX documents (HWP 5.x, HWPX, HWP 3.x best-effort)"
+name = "hwp-handler-mcp"
+version = "0.2.0"
+description = "MCP server for Korean HWP/HWPX documents — read HWP 5.x and HWPX, edit and generate HWPX"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-authors = [{ name = "rudtn", email = "rudtnrla20000@gmail.com" }]
-requires-python = ">=3.11,<3.13"
-keywords = ["mcp", "hwp", "hwpx", "korean", "hancom"]
+authors = [{ name = "trevi00", email = "rudtnrla20000@gmail.com" }]
+requires-python = ">=3.11"
+keywords = ["mcp", "hwp", "hwpx", "korean", "hancom", "hangul", "model-context-protocol"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: Korean",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Office/Business",
     "Topic :: Text Processing",
 ]
 dependencies = [
-    "mcp[cli]>=1.27.0,<2.0.0",
-    "python-hwpx>=2.9,<3.0",
-    "hwp-extract>=0.1,<0.2",
+    "mcp[cli]>=1.27.0",
+    "python-hwpx>=5.6,<6.0",
     "olefile>=0.47",
-    "lxml>=4.9",
     "pydantic>=2.5",
+    # 신뢰할 수 없는 문서의 XML을 파싱하므로 entity 확장 폭탄 방어가 필요하다.
+    "defusedxml>=0.7,<1.0",
 ]
 
 [project.optional-dependencies]
-hwp3 = ["hwplib-py>=1.0"]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
     "pytest-cov>=5.0",
     "ruff>=0.6",
     "mypy>=1.10",
+    "types-defusedxml>=0.7",
 ]
 
 [project.scripts]
-hwp-mcp = "hwp_mcp.__main__:main"
+hwp-handler-mcp = "hwp_handler_mcp.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/trevi00/hwp-mcp"
-Repository = "https://github.com/trevi00/hwp-mcp"
+Homepage = "https://github.com/trevi00/hwp-handler-mcp"
+Repository = "https://github.com/trevi00/hwp-handler-mcp"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/hwp_mcp"]
+packages = ["src/hwp_handler_mcp"]
 
 [tool.ruff]
 line-length = 100
@@ -73,8 +75,14 @@ disallow_incomplete_defs = true
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["olefile.*", "lxml.*"]
+module = ["olefile.*", "hwpx.*"]
 ignore_missing_imports = true
+
+# MCP SDK의 @mcp.tool() 데코레이터는 타입이 없어 감싸는 함수를 untyped로 만든다.
+# 도구 정의 자체는 전부 타입이 붙어 있으므로 이 파일에서만 해당 코드를 끈다.
+[[tool.mypy.overrides]]
+module = ["hwp_handler_mcp.server"]
+disable_error_code = ["untyped-decorator"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

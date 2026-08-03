@@ -131,7 +131,7 @@ from mcp.shared.exceptions import McpError
 from mcp.types import ErrorData, INVALID_PARAMS
 from pydantic import BaseModel, Field
 
-mcp = FastMCP("hwp-mcp")
+mcp = FastMCP("hwp-handler-mcp")
 
 class ExtractResult(BaseModel):
     text: str

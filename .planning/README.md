@@ -1,4 +1,4 @@
-# hwp-mcp Planning
+# hwp-handler-mcp Planning
 
 파이프라인 기반 진행. 각 단계 산출물은 다음 단계 입력.
 

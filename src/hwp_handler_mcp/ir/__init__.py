@@ -1,4 +1,4 @@
-from hwp_mcp.ir.document import (
+from hwp_handler_mcp.ir.document import (
     Attachment,
     BreakKind,
     Cell,

@@ -4,10 +4,10 @@ import zipfile
 from pathlib import Path
 
 import pytest
-from mcp.shared.exceptions import McpError
 
-from hwp_mcp.ir import Format
-from hwp_mcp.parsers.detect import (
+from hwp_handler_mcp._compat import McpError
+from hwp_handler_mcp.ir import Format
+from hwp_handler_mcp.parsers.detect import (
     HWP5_SIGNATURE,
     OLE2_MAGIC,
     ZIP_MAGIC,

@@ -2,6 +2,7 @@
 
 근거: .planning/research/RHWP-HWP5-PARSER.md §1-9 + §7 의사코드.
 """
+
 from __future__ import annotations
 
 import io
@@ -12,8 +13,8 @@ from collections.abc import Iterator
 
 import olefile
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import (
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import (
     BreakKind,
     Document,
     Format,
@@ -23,7 +24,8 @@ from hwp_mcp.ir import (
     Section,
     SecurityFlags,
 )
-from hwp_mcp.parsers.detect import parse_hwp5_flags
+from hwp_handler_mcp.parsers.detect import parse_hwp5_flags
+from hwp_handler_mcp.parsers.summary import read_hwp5_summary
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +57,17 @@ def parse_hwp5(path_or_bytes: str | bytes) -> Document:
         section_streams = _collect_section_streams(ole, flags.compressed)
         sections = tuple(_parse_section(idx, raw) for idx, raw in enumerate(section_streams))
 
-        metadata = Metadata(section_count=len(sections))
+        summary = read_hwp5_summary(ole)
+        metadata = Metadata(
+            title=summary.get("title"),
+            author=summary.get("author"),
+            last_author=summary.get("last_author"),
+            created_at=summary.get("created_at"),
+            modified_at=summary.get("modified_at"),
+            section_count=len(sections),
+            page_count=summary.get("page_count"),
+            raw=summary.get("raw", {}),
+        )
 
         return Document(
             format=Format.HWP5,
@@ -77,13 +89,11 @@ def _enforce_security_policy(flags: SecurityFlags) -> None:
     if flags.public_key_encrypted:
         raise_hwp_error(ErrorCode.PKI_ENCRYPTED)
     if flags.encrypted:
-        # Phase A: 비밀번호 복호화 미지원
+        # 암호화 문서 복호화는 미지원 — 명시적으로 거부한다.
         raise_hwp_error(ErrorCode.PASSWORD_REQUIRED)
 
 
-def _collect_section_streams(
-    ole: olefile.OleFileIO, compressed: bool
-) -> list[bytes]:
+def _collect_section_streams(ole: olefile.OleFileIO, compressed: bool) -> list[bytes]:
     """BodyText/Section{N} 스트림을 enumerate해 압축 해제된 바이트 리스트 반환."""
     streams: list[bytes] = []
     idx = 0
@@ -126,9 +136,7 @@ def _parse_section(index: int, data: bytes) -> Section:
     for tag_id, _level, body in _read_records(data):
         if tag_id == HWPTAG_PARA_HEADER:
             if current_text or paragraphs:
-                paragraphs.append(
-                    _flush_paragraph(para_index, current_text, current_break)
-                )
+                paragraphs.append(_flush_paragraph(para_index, current_text, current_break))
                 para_index += 1
             current_text = []
             current_break = _parse_break_type(body)
@@ -142,9 +150,7 @@ def _parse_section(index: int, data: bytes) -> Section:
     return Section(index=index, paragraphs=tuple(paragraphs))
 
 
-def _flush_paragraph(
-    index: int, text_chunks: list[str], break_after: BreakKind
-) -> Paragraph:
+def _flush_paragraph(index: int, text_chunks: list[str], break_after: BreakKind) -> Paragraph:
     text = "".join(text_chunks)
     return Paragraph(
         index=index,

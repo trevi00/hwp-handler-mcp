@@ -2,6 +2,7 @@
 
 근거: .planning/research/RHWP-HWPX-PARSER.md, PYTHON-OSS.md.
 """
+
 from __future__ import annotations
 
 import logging
@@ -9,8 +10,8 @@ import logging
 from hwpx import HwpxDocument
 from hwpx.tools.text_extractor import TextExtractor
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import (
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import (
     Document,
     Format,
     Metadata,
@@ -19,6 +20,7 @@ from hwp_mcp.ir import (
     Section,
     SecurityFlags,
 )
+from hwp_handler_mcp.parsers.opf import read_hwpx_package_metadata
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ def parse_hwpx(path: str) -> Document:
 
     try:
         sections = _build_sections(path)
-        metadata = _extract_metadata(doc, section_count=len(sections))
+        metadata = _extract_metadata(doc, section_count=len(sections), path=path)
         version = _read_version(doc)
     finally:
         doc.close()
@@ -70,24 +72,34 @@ def _build_sections(path: str) -> tuple[Section, ...]:
                         runs=(Run(text=text),) if text else (),
                     )
                 )
-            out.append(
-                Section(index=section_info.index, paragraphs=tuple(paragraphs))
-            )
+            out.append(Section(index=section_info.index, paragraphs=tuple(paragraphs)))
     finally:
         extractor.close()
     return tuple(out)
 
 
-def _extract_metadata(doc: HwpxDocument, *, section_count: int) -> Metadata:
-    """문서 메타데이터 추출. rhwp는 안 읽지만 python-hwpx가 일부 노출."""
-    raw: dict[str, str] = {}
+def _extract_metadata(doc: HwpxDocument, *, section_count: int, path: str) -> Metadata:
+    """HWPX 메타데이터 추출.
 
-    # python-hwpx가 어떤 메타를 노출하는지 best-effort로 시도
-    # — package 객체에 manifest/spine 정보가 있고, 헤더 .xml에 begin numbers 등
+    OWPML 은 ``Contents/content.hpf`` 의 ``<opf:metadata>`` 에 제목/작성자/일시를
+    담는다. python-hwpx 가 그대로 노출하지 않으므로 컨테이너에서 직접 읽는다.
+    """
+    raw: dict[str, str] = {}
     try:
         if hasattr(doc, "headers") and doc.headers:
             raw["headers_count"] = str(len(doc.headers))
     except Exception as exc:  # noqa: BLE001
-        log.debug("HWPX 메타 추출 부분 실패: %s", exc)
+        log.debug("HWPX 헤더 수 확인 실패: %s", exc)
 
-    return Metadata(section_count=section_count, raw=raw)
+    opf = read_hwpx_package_metadata(path)
+    raw.update(opf.get("raw", {}))
+
+    return Metadata(
+        title=opf.get("title"),
+        author=opf.get("author"),
+        last_author=opf.get("last_author"),
+        created_at=opf.get("created_at"),
+        modified_at=opf.get("modified_at"),
+        section_count=section_count,
+        raw=raw,
+    )

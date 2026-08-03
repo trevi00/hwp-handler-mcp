@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hwp_mcp.ir import (
+from hwp_handler_mcp.ir import (
     BreakKind,
     Document,
     Format,
@@ -13,7 +13,7 @@ from hwp_mcp.ir import (
     SecurityFlags,
     TablePayload,
 )
-from hwp_mcp.tools.text import document_to_text
+from hwp_handler_mcp.tools.text import document_to_text
 
 
 def _doc_with_paragraphs(paragraphs: tuple[Paragraph, ...]) -> Document:
@@ -61,7 +61,7 @@ def test_document_to_text_table_placeholder_default() -> None:
 
 
 def test_document_to_text_table_inline_markdown() -> None:
-    from hwp_mcp.ir import Cell
+    from hwp_handler_mcp.ir import Cell
 
     cells = (
         (

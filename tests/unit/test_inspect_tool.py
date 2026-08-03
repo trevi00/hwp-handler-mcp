@@ -4,9 +4,9 @@ import zipfile
 from pathlib import Path
 
 import pytest
-from mcp.shared.exceptions import McpError
 
-from hwp_mcp.tools.inspect import inspect_structure_impl
+from hwp_handler_mcp._compat import McpError
+from hwp_handler_mcp.tools.inspect import inspect_structure_impl
 
 
 def test_inspect_structure_invalid_file_raises(tmp_path: Path) -> None:

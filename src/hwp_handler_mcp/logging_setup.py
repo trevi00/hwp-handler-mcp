@@ -7,7 +7,7 @@ import sys
 
 def setup_logging() -> None:
     if hasattr(sys.stderr, "reconfigure"):
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     level = os.environ.get("HWP_MCP_LOG_LEVEL", "WARNING").upper()
     logging.basicConfig(
         stream=sys.stderr,

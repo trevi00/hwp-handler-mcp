@@ -4,8 +4,8 @@ import struct
 import zipfile
 from pathlib import Path
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import Format, SecurityFlags
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import Format, SecurityFlags
 
 OLE2_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
 ZIP_MAGIC = b"PK\x03\x04"
@@ -54,9 +54,7 @@ def _detect_zip_format(path: Path) -> Format:
 def parse_hwp5_flags(file_header_bytes: bytes) -> tuple[str, SecurityFlags]:
     """HWP5 FileHeader 256바이트 → (version, SecurityFlags)."""
     if len(file_header_bytes) < 40:
-        raise_hwp_error(
-            ErrorCode.INVALID_FORMAT, detail="FileHeader < 40 bytes"
-        )
+        raise_hwp_error(ErrorCode.INVALID_FORMAT, detail="FileHeader < 40 bytes")
     if not file_header_bytes[:17].startswith(HWP5_SIGNATURE):
         raise_hwp_error(ErrorCode.INVALID_FORMAT, detail="HWP5 시그니처 불일치")
 

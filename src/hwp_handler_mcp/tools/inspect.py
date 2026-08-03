@@ -1,4 +1,5 @@
 """detect_format + inspect_structure MCP 도구."""
+
 from __future__ import annotations
 
 import hashlib
@@ -11,9 +12,9 @@ from pathlib import Path
 import olefile
 from pydantic import BaseModel, Field
 
-from hwp_mcp.errors import ErrorCode, raise_hwp_error
-from hwp_mcp.ir import Format
-from hwp_mcp.parsers.detect import detect_magic, parse_hwp5_flags
+from hwp_handler_mcp.errors import ErrorCode, raise_hwp_error
+from hwp_handler_mcp.ir import Format
+from hwp_handler_mcp.parsers.detect import detect_magic, parse_hwp5_flags
 
 
 class FormatInfo(BaseModel):
@@ -47,9 +48,7 @@ def detect_format_impl(path: str) -> FormatInfo:
             ole = olefile.OleFileIO(str(p))
             try:
                 if not ole.exists("FileHeader"):
-                    raise_hwp_error(
-                        ErrorCode.INVALID_FORMAT, detail="FileHeader 스트림 없음"
-                    )
+                    raise_hwp_error(ErrorCode.INVALID_FORMAT, detail="FileHeader 스트림 없음")
                 hdr = ole.openstream("FileHeader").read()
                 version, flags = parse_hwp5_flags(hdr)
                 flags_kwargs = {

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import struct
 
-from hwp_mcp.ir import BreakKind
-from hwp_mcp.parsers.hwp5 import _decode_para_text, _parse_break_type, _read_records
+from hwp_handler_mcp.ir import BreakKind
+from hwp_handler_mcp.parsers.hwp5 import _decode_para_text, _parse_break_type, _read_records
 
 
 def _make_record(tag_id: int, level: int, body: bytes) -> bytes:

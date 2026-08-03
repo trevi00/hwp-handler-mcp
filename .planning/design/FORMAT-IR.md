@@ -110,7 +110,7 @@ PageDef                      (옵션, 렌더링용 정보)
 
 ---
 
-## 3. dataclass 정의 (`src/hwp_mcp/ir/document.py`)
+## 3. dataclass 정의 (`src/hwp_handler_mcp/ir/document.py`)
 
 ```python
 from __future__ import annotations

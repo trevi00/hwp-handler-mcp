@@ -1,4 +1,4 @@
-# hwp-mcp MCP API 설계
+# hwp-handler-mcp MCP API 설계
 
 작성일: 2026-04-29
 근거: REQUIREMENTS.md §3, FORMAT-IR.md, PYTHON-OSS.md §3
@@ -11,7 +11,7 @@
 
 ### 1.1 transport
 - stdio (JSON-RPC 2.0)
-- 서버 등록 이름: `hwp-mcp`
+- 서버 등록 이름: `hwp-handler-mcp`
 
 ### 1.2 입력 공통
 - `path: str` — **절대경로 권장**. 상대경로는 `Path.cwd()`로 resolve. UNC/심볼릭 링크는 거부 또는 재해석
@@ -382,7 +382,7 @@ class AttachmentContent(BaseModel):
 | `PARTIAL_PARSE_FAILED` | 500 | "파일을 부분 파싱할 수 없습니다" |
 | `INTERNAL_ERROR` | 500 | "내부 오류 — 자세한 내용은 로그 참조" |
 
-→ Python에서 `class ErrorCode(str, Enum): ...`로 정의 (`src/hwp_mcp/errors.py`).
+→ Python에서 `class ErrorCode(str, Enum): ...`로 정의 (`src/hwp_handler_mcp/errors.py`).
 
 ---
 
