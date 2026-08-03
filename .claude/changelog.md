@@ -1,5 +1,10 @@
 # Change Log
 
+- `[2026-08-03 18:40:42]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/_compat.py` (_compat.py)
+- `[2026-08-03 18:40:05]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/server.py` (server.py)
+- `[2026-08-03 18:39:58]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/server.py` (server.py)
+- `[2026-08-03 18:39:54]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/_compat.py` (_compat.py)
+- `[2026-08-03 18:39:46]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/_compat.py` (_compat.py)
 - `[2026-08-03 18:37:42]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
 - `[2026-08-03 18:36:58]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/_compat.py` (_compat.py)
 - `[2026-08-03 18:36:50]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/server.py` (server.py)

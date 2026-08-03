@@ -21,10 +21,33 @@ __all__ = [
     "McpError",
     "ServerClass",
     "build_mcp_error",
+    "create_server",
     "package_version",
 ]
 
 DISTRIBUTION_NAME = "hwp-handler-mcp"
+
+
+def create_server(name: str) -> Any:
+    """SDK 메이저에 맞게 서버 인스턴스를 만든다.
+
+    2.x 의 ``MCPServer`` 는 ``version`` 을 받아 ``serverInfo.version`` 으로 내보내지만,
+    1.x 의 ``FastMCP`` 에는 그 인자가 아예 없어서 ``TypeError`` 가 난다. 지원하는
+    쪽에만 넘긴다.
+    """
+    import inspect
+
+    version = package_version()
+    if version:
+        try:
+            accepts_version = (
+                "version" in inspect.signature(ServerClass.__init__).parameters
+            )
+        except (TypeError, ValueError):  # pragma: no cover — 시그니처를 못 읽는 구현
+            accepts_version = False
+        if accepts_version:
+            return ServerClass(name, version=version)
+    return ServerClass(name)
 
 
 def package_version() -> str:
