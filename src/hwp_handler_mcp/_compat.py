@@ -40,9 +40,7 @@ def create_server(name: str) -> Any:
     version = package_version()
     if version:
         try:
-            accepts_version = (
-                "version" in inspect.signature(ServerClass.__init__).parameters
-            )
+            accepts_version = "version" in inspect.signature(ServerClass.__init__).parameters
         except (TypeError, ValueError):  # pragma: no cover — 시그니처를 못 읽는 구현
             accepts_version = False
         if accepts_version:
