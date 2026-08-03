@@ -1,5 +1,10 @@
 # Change Log
 
+- `[2026-08-03 18:37:42]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
+- `[2026-08-03 18:36:58]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/_compat.py` (_compat.py)
+- `[2026-08-03 18:36:50]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/server.py` (server.py)
+- `[2026-08-03 18:36:46]` **MODIFY** `C:/Users/user/hwp-mcp/src/hwp_handler_mcp/server.py` (server.py)
+- `[2026-08-03 18:36:25]` **CREATE** `C:/Users/user/AppData/Local/Temp/claude/C--Users-user/b18993d2-04aa-4250-b6da-77ad720294e7/scratchpad/hs2.py` (hs2.py)
 - `[2026-08-03 18:31:59]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
 - `[2026-08-03 18:26:01]` **CREATE** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
 - `[2026-08-03 18:20:06]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_xml_hardening.py` (test_xml_hardening.py)

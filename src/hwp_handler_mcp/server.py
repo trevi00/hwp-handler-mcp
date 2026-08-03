@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hwp_handler_mcp._compat import ServerClass
+from hwp_handler_mcp._compat import ServerClass, package_version
 from hwp_handler_mcp.logging_setup import setup_logging
 from hwp_handler_mcp.tools.attach import (
     AttachmentContent,
@@ -31,7 +31,7 @@ from hwp_handler_mcp.tools.text import ExtractText, extract_text_impl
 
 setup_logging()
 
-mcp = ServerClass("hwp-handler-mcp")
+mcp = ServerClass("hwp-handler-mcp", version=package_version())
 
 
 # ---------------------------------------------------------------------------

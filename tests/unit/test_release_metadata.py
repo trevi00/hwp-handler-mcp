@@ -60,6 +60,16 @@ def test_description_within_registry_limit(server_json: dict) -> None:
     assert len(server_json["description"]) <= 100
 
 
+def test_server_reports_its_version_to_clients(pyproject: dict) -> None:
+    """``serverInfo.version`` 이 비면 클라이언트가 어떤 버전을 쓰는지 알 수 없다.
+
+    MCPServer 의 version 기본값이 빈 문자열이라 넘기지 않으면 조용히 비어 있다.
+    """
+    from hwp_handler_mcp._compat import package_version
+
+    assert package_version() == pyproject["project"]["version"]
+
+
 def test_dev_dependency_lists_do_not_drift(pyproject: dict) -> None:
     """dev 의존성이 두 군데에 있고 어긋나면 CI 에서만 터진다.
 

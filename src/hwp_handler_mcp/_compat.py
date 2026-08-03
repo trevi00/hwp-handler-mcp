@@ -16,7 +16,29 @@ from typing import Any, cast
 
 from mcp.types import ErrorData
 
-__all__ = ["MCP_SDK_MAJOR", "McpError", "ServerClass", "build_mcp_error"]
+__all__ = [
+    "MCP_SDK_MAJOR",
+    "McpError",
+    "ServerClass",
+    "build_mcp_error",
+    "package_version",
+]
+
+DISTRIBUTION_NAME = "hwp-handler-mcp"
+
+
+def package_version() -> str:
+    """설치된 배포판 버전. 클라이언트의 ``serverInfo.version`` 에 실린다.
+
+    소스 트리에서 바로 실행하는 등 배포판 메타데이터가 없을 수 있으므로,
+    없을 때는 서버 기동을 막지 않고 빈 문자열을 돌려준다.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version(DISTRIBUTION_NAME)
+    except PackageNotFoundError:  # pragma: no cover — 설치 없이 실행한 경우
+        return ""
 
 
 def _resolve_server() -> tuple[Any, int]:
