@@ -1,5 +1,6 @@
 # Change Log
 
+- `[2026-08-03 18:31:59]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
 - `[2026-08-03 18:26:01]` **CREATE** `C:/Users/user/hwp-mcp/tests/unit/test_release_metadata.py` (test_release_metadata.py)
 - `[2026-08-03 18:20:06]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_xml_hardening.py` (test_xml_hardening.py)
 - `[2026-08-03 18:19:33]` **MODIFY** `C:/Users/user/hwp-mcp/tests/unit/test_xml_hardening.py` (test_xml_hardening.py)

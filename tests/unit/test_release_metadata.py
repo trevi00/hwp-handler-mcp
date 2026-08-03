@@ -58,3 +58,18 @@ def test_readme_carries_mcp_name_token(server_json: dict) -> None:
 def test_description_within_registry_limit(server_json: dict) -> None:
     """MCP 레지스트리 스키마의 description maxLength 는 100 이다."""
     assert len(server_json["description"]) <= 100
+
+
+def test_dev_dependency_lists_do_not_drift(pyproject: dict) -> None:
+    """dev 의존성이 두 군데에 있고 어긋나면 CI 에서만 터진다.
+
+    실제로 그랬다: ``types-defusedxml`` 이 extra 에만 있어서 ``uv run`` 의
+    기본 동기화(--all-extras 없음)가 그걸 제거했고, py3.12/3.13 타입체크가
+    "stubs not installed" 로 실패했다. 로컬은 이미 설치돼 있어 재현되지 않았다.
+    """
+    extra = set(pyproject["project"]["optional-dependencies"]["dev"])
+    group = set(pyproject["dependency-groups"]["dev"])
+    assert extra == group, (
+        "optional-dependencies.dev 와 dependency-groups.dev 가 어긋났다. "
+        f"extra에만={extra - group}, group에만={group - extra}"
+    )
